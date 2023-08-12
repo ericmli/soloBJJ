@@ -10,8 +10,8 @@ export const Container = styled.SafeAreaView`
 `
 export const ContainerTimeReal = styled.View`
   position: absolute;
-  right: 42px;
-  top: 100px;
+  right: 10%;
+  bottom: 0px;
 `
 export const ContainerSvg = styled.View`
   position: absolute;
@@ -43,10 +43,9 @@ export const ContainerTime = styled.View`
 
 `
 export const SelectTime = styled.TouchableOpacity`
-  border-width: 1px;
-  border-radius: ${({ theme }) => theme.spacings.nano};
-  border-color: black;
-  padding: ${({ theme }) => theme.spacings.small};
+  height: 50px;
+  width: 50px;
+  background-color: red;
 `
 export const SelectTimeRow = styled.View`
   flex-direction: row;

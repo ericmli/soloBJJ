@@ -1,34 +1,53 @@
-import React, { useState } from 'react';
-import { View, Text } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import { Container, Selector } from './styles';
+import React, { useEffect, useState } from 'react';
+import { Container, Footer, More } from './styles';
+import { Title } from '../title';
 
 interface NumberPickerProps {
-  amount?: number
+  unique?: boolean
+  quantityBack: (i: number) => void
 }
 
-export function NumberPicker(amount: NumberPickerProps) {
+export function NumberPicker({ unique, quantityBack }: NumberPickerProps) {
   const [selectedNumber, setSelectedNumber] = useState<number>(0);
-  const quantity = amount.amount
-  const handleNumberChange = (itemValue: number, itemIndex: number) => {
-    setSelectedNumber(itemValue);
-  };
-  const generatePickerItems = (count: any) => {
-    const items = [];
-    for (let i = 0; i <= count; i++) {
-      items.push(<Picker.Item key={i} label={String(i).padStart(2, '0')} value={i} />);
+  useEffect(() => {
+    if (unique) {
+      setSelectedNumber(1)
+    } else {
+      setSelectedNumber(30)
     }
-    return items;
-  };
+  }, [])
+  function sendMainScreen(item: boolean) {
+    let changeAmount = unique ? 1 : 10;
+    let newSelectedNumber = selectedNumber;
+
+    if (item) {
+      if (selectedNumber < 60) {
+        newSelectedNumber += changeAmount;
+      }
+    } else {
+      if (selectedNumber > 0) {
+        newSelectedNumber -= changeAmount;
+      }
+    }
+
+    setSelectedNumber(newSelectedNumber);
+
+    if (quantityBack) {
+      quantityBack(newSelectedNumber);
+    }
+  }
+
   return (
     <Container>
-      <Selector
-        selectedValue={selectedNumber}
-        onValueChange={handleNumberChange}
-      >
-        {generatePickerItems(quantity)}
-      </Selector>
-
+      <Title text={String(selectedNumber)} />
+      <Footer>
+        <More onPress={() => sendMainScreen(false)}>
+          <Title text='-' size='medium' />
+        </More>
+        <More onPress={() => sendMainScreen(true)}>
+          <Title text='+' size='medium' />
+        </More>
+      </Footer>
     </Container>
   );
 };
