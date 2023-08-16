@@ -1,8 +1,8 @@
 export default {
   font: {
-    light: 'OpenSans-Light',
-    regular: 'OpenSans-Regular',
-    bold: 'OpenSans-Bold',
+    light: 'Montserrat-Light',
+    regular: 'Montserrat-Regular',
+    bold: 'Montserrat-SemiBold',
     size: {
       nano: '10px',
       xnano: '12px',

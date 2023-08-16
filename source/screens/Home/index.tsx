@@ -1,56 +1,86 @@
 import React, { useState } from 'react';
-import { Container, ContainerSvg, ContainerSvgTop, ContainerTime, ContainerTimeReal, ContainerTimeSelect, SelectTime, SelectTimeRow } from './styles';
+import { Body, Container, ContainerStart, ContainerSvgTop, ContainerTime, ContainerTimeSelect, ContainerTimerReal, Footer, Icon, SelectTime, SelectTimeRow } from './styles';
 import { TimeReal } from '../../components/timeReal';
 import SvgComponent from '../../assets/svg/svg';
 import { Title } from '../../components/title';
 import SvgComponent2 from '../../assets/svg/svgSlim';
 import { NumberPicker } from '../../components/numberPicker';
+import { useNavigation } from '@react-navigation/native';
+import { Timer } from '../Timer';
 
 export function Home() {
-  const [childData, setChildData] = useState<number>(0);
+  const navigation = useNavigation();
+  const [childData, setChildData] = useState<number[]>([1, 1, 30, 0, 30]);
+  const [switchScreen, setSwitchScreen] = useState<boolean>(true);
+  const [stopTimer, setStopTimer] = useState<boolean>(false);
 
-  function handleChildData(dataFromChild: number) {
-    console.log(dataFromChild)
-    setChildData(dataFromChild);
+
+  function handleChildData(index: number, dataFromChild: number) {
+    const newChildValues = [...childData];
+    newChildValues[index] = dataFromChild;
+    setChildData(newChildValues);
   }
+
   return (
     <Container>
-      <ContainerTimeReal>
-        <TimeReal />
-      </ContainerTimeReal>
-      <ContainerSvgTop>
-        <SvgComponent />
-      </ContainerSvgTop>
-      <ContainerTimeSelect>
-        <ContainerTime>
-          <Title text='ROUND' size='xlarge' family='bold' marginBottom='xnano' />
-          <SelectTimeRow>
-            <NumberPicker quantityBack={handleChildData} unique />
-          </SelectTimeRow>
-        </ContainerTime>
+      <Body>
+        <ContainerSvgTop>
+          <SvgComponent />
+        </ContainerSvgTop>
 
-        <ContainerTime>
-          <Title text='TIMER' size='xlarge' family='bold' marginBottom='xnano' />
-          <SelectTimeRow>
-            <NumberPicker quantityBack={handleChildData} unique />
-            <Title text=':' size='xlarge' />
-            <NumberPicker quantityBack={handleChildData} />
-          </SelectTimeRow>
-        </ContainerTime>
+        {switchScreen ? (<ContainerTimeSelect>
 
-        <ContainerTime>
-          <Title text='PREPARATION' size='xlarge' family='bold' marginBottom='xnano' />
-          <SelectTimeRow>
-            <NumberPicker quantityBack={handleChildData} unique />
-            <Title text=':' size='xlarge' />
-            <NumberPicker quantityBack={handleChildData} />
-          </SelectTimeRow>
-        </ContainerTime>
-      </ContainerTimeSelect>
-        {/* <SelectTime/> */}
-      <ContainerSvg>
-        <SvgComponent2 />
-      </ContainerSvg>
+          <ContainerTime>
+            <Title text='RODADA' size='large' family='bold' marginBottom='xnano' />
+            <SelectTimeRow>
+              <NumberPicker initialNumber={childData[0]} quantityBack={handleChildData} index={0} unique />
+            </SelectTimeRow>
+          </ContainerTime>
+
+          <ContainerTime>
+            <Title text='TEMPO' size='large' family='bold' marginBottom='xnano' />
+            <SelectTimeRow>
+              <NumberPicker initialNumber={childData[1]} quantityBack={handleChildData} index={1} unique />
+              <Title text=':' size='xlarge' />
+              <NumberPicker initialNumber={childData[2]} quantityBack={handleChildData} index={2} />
+            </SelectTimeRow>
+          </ContainerTime>
+
+          <ContainerTime>
+            <Title text='PREPARAÇÃO' size='large' family='bold' marginBottom='xnano' />
+            <SelectTimeRow>
+              <NumberPicker initialNumber={childData[3]} quantityBack={handleChildData} index={3} unique />
+              <Title text=':' size='xlarge' />
+              <NumberPicker initialNumber={childData[4]} quantityBack={handleChildData} index={4} />
+            </SelectTimeRow>
+          </ContainerTime>
+
+        </ContainerTimeSelect>
+        ) :
+          <Timer data={childData} stop={stopTimer} />
+        }
+
+        <Footer>
+
+          <ContainerStart>
+            {!switchScreen && <SelectTime onPress={() => setStopTimer(!stopTimer)}>
+              <Icon name={!stopTimer ? 'pause' : 'play'} size={40} color='white' />
+            </SelectTime>}
+            <SelectTime onPress={() => {
+              setSwitchScreen(!switchScreen)
+              setStopTimer(false)
+              }}>
+              <Icon name={switchScreen ? 'play' : 'undo-variant'} size={40} color='white' />
+            </SelectTime>
+
+          </ContainerStart>
+
+          <SvgComponent2 />
+          <ContainerTimerReal>
+            <TimeReal />
+          </ContainerTimerReal>
+        </Footer>
+      </Body>
     </Container>
   );
 }

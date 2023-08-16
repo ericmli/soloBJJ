@@ -3,23 +3,23 @@ import { Container, Footer, More } from './styles';
 import { Title } from '../title';
 
 interface NumberPickerProps {
-  unique?: boolean
-  quantityBack: (i: number) => void
+  index: number;
+  unique?: boolean;
+  quantityBack?: (index: number, value: number) => void;
+  initialNumber: number
 }
 
-export function NumberPicker({ unique, quantityBack }: NumberPickerProps) {
+export function NumberPicker({ initialNumber, index, unique, quantityBack }: NumberPickerProps) {
   const [selectedNumber, setSelectedNumber] = useState<number>(0);
+  
   useEffect(() => {
-    if (unique) {
-      setSelectedNumber(1)
-    } else {
-      setSelectedNumber(30)
-    }
-  }, [])
+    setSelectedNumber(initialNumber);
+  }, []);
+  
   function sendMainScreen(item: boolean) {
     let changeAmount = unique ? 1 : 10;
     let newSelectedNumber = selectedNumber;
-
+    
     if (item) {
       if (selectedNumber < 60) {
         newSelectedNumber += changeAmount;
@@ -29,25 +29,25 @@ export function NumberPicker({ unique, quantityBack }: NumberPickerProps) {
         newSelectedNumber -= changeAmount;
       }
     }
-
+    
     setSelectedNumber(newSelectedNumber);
-
+    
     if (quantityBack) {
-      quantityBack(newSelectedNumber);
+      quantityBack(index, newSelectedNumber);
     }
   }
-
+  
   return (
     <Container>
-      <Title text={String(selectedNumber)} />
+      <Title family='bold' text={String(selectedNumber)} size='xsmall' />
       <Footer>
         <More onPress={() => sendMainScreen(false)}>
-          <Title text='-' size='medium' />
+          <Title text='-' family='bold' size='large' />
         </More>
         <More onPress={() => sendMainScreen(true)}>
-          <Title text='+' size='medium' />
+          <Title text='+' family='bold' size='large' />
         </More>
       </Footer>
     </Container>
   );
-};
+}

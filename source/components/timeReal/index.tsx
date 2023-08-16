@@ -3,10 +3,13 @@ import { Title } from '../title';
 import moment from 'moment-timezone';
 import 'moment/locale/pt-br';
 
-export function TimeReal() {
+interface TimeRealProps {
+  big ?: boolean
+}
+
+export function TimeReal({big} : TimeRealProps) {
   const [time, setTime] = useState('');
   const [dateTime, setDateTime] = useState('');
-
   useEffect(() => {
     const intervalId = setInterval(updateTime, 1000);
     return () => clearInterval(intervalId);
@@ -29,8 +32,6 @@ export function TimeReal() {
     setDateTime(formattedDateTime);
   }
   return (
-    <>
-      <Title text={dateTime} family='bold' size='medium' marginBottom='huge' />
-    </>
+    <Title text={dateTime} family='bold' size={big ? 'huge' : 'medium'}  />
   );
 }
