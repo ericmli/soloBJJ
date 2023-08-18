@@ -32,6 +32,6 @@ export function TimeReal({big} : TimeRealProps) {
     setDateTime(formattedDateTime);
   }
   return (
-    <Title text={dateTime} family='bold' size={big ? 'huge' : 'medium'}  />
+    <Title text={dateTime} family='bold' size={big ? 'big' : 'medium'}  />
   );
 }

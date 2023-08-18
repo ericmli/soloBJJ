@@ -17,8 +17,8 @@ export const Body = styled.View`
 `
 
 export const ContainerSvgTop = styled.View`
-  position: absolute;
-  top: 0;
+    position: absolute;
+  top: -150px;
   width: 100%;
   align-items: center;
 

@@ -14,6 +14,7 @@ export default {
       xlarge: '32px',
       xxlarge: '40px',
       huge: '48px',
+      big: '134px',
     },
   },
   colors: {

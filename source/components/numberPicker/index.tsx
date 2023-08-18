@@ -39,7 +39,7 @@ export function NumberPicker({ initialNumber, index, unique, quantityBack }: Num
   
   return (
     <Container>
-      <Title family='bold' text={String(selectedNumber)} size='xsmall' />
+      <Title family='bold' text={String(selectedNumber)} size='large' />
       <Footer>
         <More onPress={() => sendMainScreen(false)}>
           <Title text='-' family='bold' size='large' />

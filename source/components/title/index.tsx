@@ -13,7 +13,8 @@ export interface TitleProps {
     | 'large'
     | 'xlarge'
     | 'xxlarge'
-    | 'huge';
+    | 'huge'
+    | 'big';
   marginTop?:
     | 'nano'
     | 'xnano'

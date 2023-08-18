@@ -31,14 +31,14 @@ export function Home() {
         {switchScreen ? (<ContainerTimeSelect>
 
           <ContainerTime>
-            <Title text='RODADA' size='large' family='bold' marginBottom='xnano' />
+            <Title text='RODADA' size='xlarge' family='bold' marginBottom='xnano' />
             <SelectTimeRow>
               <NumberPicker initialNumber={childData[0]} quantityBack={handleChildData} index={0} unique />
             </SelectTimeRow>
           </ContainerTime>
 
           <ContainerTime>
-            <Title text='TEMPO' size='large' family='bold' marginBottom='xnano' />
+            <Title text='TEMPO' size='xlarge' family='bold' marginBottom='xnano' />
             <SelectTimeRow>
               <NumberPicker initialNumber={childData[1]} quantityBack={handleChildData} index={1} unique />
               <Title text=':' size='xlarge' />
@@ -47,7 +47,7 @@ export function Home() {
           </ContainerTime>
 
           <ContainerTime>
-            <Title text='PREPARAÇÃO' size='large' family='bold' marginBottom='xnano' />
+            <Title text='PREPARAÇÃO' size='xlarge' family='bold' marginBottom='xnano' />
             <SelectTimeRow>
               <NumberPicker initialNumber={childData[3]} quantityBack={handleChildData} index={3} unique />
               <Title text=':' size='xlarge' />

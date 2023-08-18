@@ -21,8 +21,8 @@ export const SelectTimeRow = styled.View`
 export const BorderTimer = styled.View`
   border-width: 0.8px;
   border-radius: 10px;
-  width: 100px;
-  height: 100px;
+  width: 200px;
+  height: 200px;
   align-items: center;
   justify-content: center ;
 `

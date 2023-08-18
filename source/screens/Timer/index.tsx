@@ -40,12 +40,17 @@ export function Timer({ data, stop }: any) {
 
   const [maxRound, setMaxRound] = useState<number>(2)
   const [sendPrepTime, setSendPrepTime] = useState<boolean>(true)
-  const [endTime, setEndTime] = useState<boolean>(false)
+  const [endTime, setEndTime] = useState<boolean>(true)
   if (timeRemaining === 0) {
-    if (prepTime && sendPrepTime) {
+    if (endTime) {
+      setTimeRemaining(4)
+      setEndTime(false)
+    } else if (prepTime && sendPrepTime) {
+      setEndTime(true)
       setSendPrepTime(false)
       setTimeRemaining(prepTime)
     } else if (maxRound <= round) {
+      setEndTime(true)
       setMaxRound(maxRound + 1)
       setTimeRemaining(mainTime)
       setSendPrepTime(true)
@@ -54,41 +59,53 @@ export function Timer({ data, stop }: any) {
 
   useEffect(() => {
     var Sound = require('react-native-sound');
+    if (endTime) {
+      const playSound = (fileName: string) => {
+        const sound = new Sound(fileName, Sound.MAIN_BUNDLE, () => {
+          sound.play(() => {
+            sound.release();
+          });
+        });
 
-    Sound.setCategory('Playback');
+        sound.setVolume(1);
+        sound.setCategory('Playback');
 
-    if (timeRemaining === 3) {
-      const sound = new Sound('countdown_sound.mp3', Sound.MAIN_BUNDLE, (error: any) => {
-        if (error) {
-          console.log('Error loading sound: ', error);
-        } else {
-          sound.play();
-        }
-      });
+        return sound;
+      };
 
-      sound.setVolume(1);
-
+      if (timeRemaining <= 4 && timeRemaining > 1) {
+        const soundInstance = playSound('continue_timer.mp3');
+        return () => {
+          soundInstance.release();
+        };
+      }
+      if (timeRemaining === 1) {
+        const soundInstance = playSound('end_timer.mp3');
+        return () => {
+          soundInstance.release();
+        };
+      }
     }
-  }, [timeRemaining])
+  }, [timeRemaining]);
 
   return (
     <Container>
       <ContainerTime>
-        {!endTime ? <Title size='xlarge' family='bold' text={sendPrepTime ? `TEMPO ${maxRound - 1}/${round}` : 'PREPARAÇÃO'} marginBottom='small' /> :
-          <Title size='xlarge' family='bold' text='FIM' marginBottom='small' />}
+        {endTime ? <Title size='xlarge' family='bold' text={sendPrepTime ? `TEMPO ${maxRound - 1}/${round}` : 'PREPARAÇÃO'} marginBottom='small' />
+          : <Title size='xlarge' family='bold' text='ESPERA' />}
         <SelectTimeRow>
           <BorderTimer>
-            <Title size='huge' family='bold' text={transformMinutes(0)} />
+            <Title size='big' family='bold' text={transformMinutes(0)} />
           </BorderTimer>
           <BorderTimer>
-            <Title size='huge' family='bold' text={transformMinutes(1)} />
+            <Title size='big' family='bold' text={transformMinutes(1)} />
           </BorderTimer>
           <Title text=':' size='xlarge' />
           <BorderTimer>
-            <Title size='huge' family='bold' text={transformSeconds(0)} />
+            <Title size='big' family='bold' text={transformSeconds(0)} />
           </BorderTimer>
           <BorderTimer>
-            <Title size='huge' family='bold' text={transformSeconds(1)} />
+            <Title size='big' family='bold' text={transformSeconds(1)} />
           </BorderTimer>
         </SelectTimeRow>
       </ContainerTime>
