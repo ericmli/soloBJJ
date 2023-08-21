@@ -1,33 +1,64 @@
 import React, { useEffect, useState } from 'react';
 import { BorderTimer, Container, ContainerTime, SelectTimeRow } from './styles';
 import { Title } from '../../components/title';
+import * as Animatable from 'react-native-animatable';
+function activeSound() {
+  var Sound = require('react-native-sound');
 
-export function Timer({ data, stop }: any) {
+  const playSound = (fileName: string) => {
+    const sound = new Sound(fileName, Sound.MAIN_BUNDLE, () => {
+      sound.play(() => {
+        sound.release();
+      });
+    });
+
+    sound.setVolume(1);
+    sound.setCategory('Playback');
+
+    return sound;
+  };
+  const soundInstance = playSound('countdown_sound.mp3');
+  return () => {
+    soundInstance.release();
+  }
+}
+function endSound() {
+  var Sound = require('react-native-sound');
+
+  const playSound = (fileName: string) => {
+    const sound = new Sound(fileName, Sound.MAIN_BUNDLE, () => {
+      sound.play(() => {
+        sound.release();
+      });
+    });
+
+    sound.setVolume(1);
+    sound.setCategory('Playback');
+
+    return sound;
+  };
+  const soundInstance = playSound('sound_end.mp3');
+  console.log('passou');
+  return () => {
+    soundInstance.release();
+  }
+
+}
+
+export function Timer({ data, stopTime }: any) {
   const round = data[0]
   const time = data[1]
   const timeSecond = data[2]
   const prep = data[3]
   const prepSecond = data[4]
-
-  function timeInSeconds(minutes: number, seconds: number): number {
-    return minutes * 60 + seconds;
-  }
-
   const mainTime = timeInSeconds(time, timeSecond)
   const prepTime = timeInSeconds(prep, prepSecond)
-  const [timeRemaining, setTimeRemaining] = useState(mainTime);
-
-  useEffect(() => {
-    if (timeRemaining > 0 && !stop) {
-      const intervalId = setInterval(() => {
-        setTimeRemaining(prevTime => prevTime - 1);
-      }, 1000);
-
-      return () => {
-        clearInterval(intervalId);
-      };
-    }
-  }, [timeRemaining, stop])
+  const [timeRemaining, setTimeRemaining] = useState<number>(mainTime);
+  const [stop, setStop] = useState<boolean>(false);
+  const [maxRound, setMaxRound] = useState<number>(2)
+  const [sendPrepTime, setSendPrepTime] = useState<boolean>(true)
+  const [waitingAfterStop, setWaitingAfterStop] = useState<number>(5);
+  const [colorBorder, setColorBorder] = useState<boolean>(true)
 
   function transformMinutes(item: number) {
     const minutes = Math.floor(timeRemaining / 60);
@@ -37,76 +68,78 @@ export function Timer({ data, stop }: any) {
     const seconds = timeRemaining % 60;
     return seconds.toString().padStart(2, '0')[item]
   }
-
-  const [maxRound, setMaxRound] = useState<number>(2)
-  const [sendPrepTime, setSendPrepTime] = useState<boolean>(true)
-  const [endTime, setEndTime] = useState<boolean>(true)
-  if (timeRemaining === 0) {
-    if (endTime) {
-      setTimeRemaining(4)
-      setEndTime(false)
-    } else if (prepTime && sendPrepTime) {
-      setEndTime(true)
-      setSendPrepTime(false)
-      setTimeRemaining(prepTime)
-    } else if (maxRound <= round) {
-      setEndTime(true)
-      setMaxRound(maxRound + 1)
-      setTimeRemaining(mainTime)
-      setSendPrepTime(true)
-    }
+  function timeInSeconds(minutes: number, seconds: number): number {
+    return minutes * 60 + seconds;
   }
 
   useEffect(() => {
-    var Sound = require('react-native-sound');
-    if (endTime) {
-      const playSound = (fileName: string) => {
-        const sound = new Sound(fileName, Sound.MAIN_BUNDLE, () => {
-          sound.play(() => {
-            sound.release();
-          });
-        });
-
-        sound.setVolume(1);
-        sound.setCategory('Playback');
-
-        return sound;
+    if (timeRemaining > 0 && !stopTime && !stop) {
+      const intervalId = setInterval(() => {
+        setTimeRemaining(prevTime => prevTime - 1);
+      }, 1000);
+      return () => {
+        clearInterval(intervalId);
       };
+    }
+  }, [timeRemaining, stop, stopTime]);
 
-      if (timeRemaining <= 4 && timeRemaining > 1) {
-        const soundInstance = playSound('continue_timer.mp3');
-        return () => {
-          soundInstance.release();
-        };
-      }
-      if (timeRemaining === 1) {
-        const soundInstance = playSound('end_timer.mp3');
-        return () => {
-          soundInstance.release();
-        };
+  useEffect(() => {
+    if (waitingAfterStop > 0 && timeRemaining === 0) {
+      const timeoutId = setTimeout(() => {
+        setWaitingAfterStop(prevTime => prevTime - 1);
+      }, 1000);
+
+      return () => {
+        clearTimeout(timeoutId);
+      };
+    }
+  }, [timeRemaining, waitingAfterStop])
+
+  useEffect(() => {
+    if (waitingAfterStop === 4) {
+      activeSound()
+    }
+    if (waitingAfterStop === 0) {
+      setStop(true);
+      if (prepTime && sendPrepTime) {
+        setStop(false);
+        setSendPrepTime(false);
+        setTimeRemaining(prepTime);
+        setWaitingAfterStop(5)
+      } else if (maxRound <= round) {
+        endSound()
+        setStop(false);
+        setMaxRound(prevMaxRound => prevMaxRound + 1);
+        setTimeRemaining(mainTime);
+        setSendPrepTime(true);
+        setWaitingAfterStop(5)
       }
     }
-  }, [timeRemaining]);
+  }, [waitingAfterStop])
 
+  function RenderDigit({ item }: { item: string }) {
+    return (
+      <BorderTimer colorBorder={colorBorder}>
+        <Animatable.Text
+          animation={waitingAfterStop <= 4 ? 'fadeIn' : undefined}
+          duration={1000}
+          iterationCount={waitingAfterStop ? 'infinite' : 1}
+        >
+          <Title size='big' family='bold' text={item} />
+        </Animatable.Text>
+      </BorderTimer>
+    )
+  }
   return (
     <Container>
       <ContainerTime>
-        {endTime ? <Title size='xlarge' family='bold' text={sendPrepTime ? `TEMPO ${maxRound - 1}/${round}` : 'PREPARAÇÃO'} marginBottom='small' />
-          : <Title size='xlarge' family='bold' text='ESPERA' />}
+        <Title size='xlarge' family='bold' text={sendPrepTime ? `TEMPO ${maxRound - 1}/${round}` : 'PREPARAÇÃO'} marginBottom='small' />
         <SelectTimeRow>
-          <BorderTimer>
-            <Title size='big' family='bold' text={transformMinutes(0)} />
-          </BorderTimer>
-          <BorderTimer>
-            <Title size='big' family='bold' text={transformMinutes(1)} />
-          </BorderTimer>
-          <Title text=':' size='xlarge' />
-          <BorderTimer>
-            <Title size='big' family='bold' text={transformSeconds(0)} />
-          </BorderTimer>
-          <BorderTimer>
-            <Title size='big' family='bold' text={transformSeconds(1)} />
-          </BorderTimer>
+          <RenderDigit item={transformMinutes(0)} />
+          <RenderDigit item={transformMinutes(1)} />
+          <Title text=':' size='huge' />
+          <RenderDigit item={transformSeconds(0)} />
+          <RenderDigit item={transformSeconds(1)} />
         </SelectTimeRow>
       </ContainerTime>
     </Container>

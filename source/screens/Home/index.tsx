@@ -57,7 +57,7 @@ export function Home() {
 
         </ContainerTimeSelect>
         ) :
-          <Timer data={childData} stop={stopTimer} />
+          <Timer data={childData} stopTime={stopTimer} />
         }
 
         <Footer>
